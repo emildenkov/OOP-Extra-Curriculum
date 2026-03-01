@@ -9,7 +9,7 @@ class UniversalDataConverter:
         self.data_frame = None
         self.container = None
 
-    def read_file(self):
+    def read_file(self, delimiter='.', encoding='utf-8'):
 
         if not os.path.exists(self.file_path):
             raise FileNotFoundError(f"The file {self.file_path} doesn't exist")
@@ -18,7 +18,7 @@ class UniversalDataConverter:
 
         try:
             if extension == ".csv":
-                self.data_frame = pd.read_csv(self.file_path)
+                self.data_frame = pd.read_csv(self.file_path, sep=delimiter, encoding=encoding)
             elif extension == ".json":
                 self.data_frame = pd.read_json(self.file_path)
             elif extension == ".xlsx":
@@ -41,11 +41,13 @@ class UniversalDataConverter:
 
         if container_type == "dataframe":
             self.container = self.data_frame
+            return self.container
 
         if element_type == "dict":
             self.container = self.data_frame.to_dict('records')
         elif element_type == "namedtuple":
-            DataPoint = namedtuple("DataPoint", self.container.columns)
+            clean_columns = [col.replace(' ', '_') for col in self.data_frame.columns]
+            DataPoint = namedtuple("DataPoint", clean_columns)
             self.container = [DataPoint(*row) for row in self.data_frame.itertuples(index=False)]
 
         return self.container
