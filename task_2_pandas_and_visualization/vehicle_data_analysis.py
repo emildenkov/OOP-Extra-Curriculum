@@ -2,6 +2,9 @@ import pandas as pd
 from task_1_file_handling.universal_data_converter import UniversalDataConverter
 import matplotlib.pyplot as plt
 
+from task_3_pdf_files.pdf_handling import generate_dynamic_report
+
+
 def main():
 
     file_name = '20-registrirani-pps-po-oblasti-i-vid-gorivo-pozitsiya-p3-v-srmps.csv'
@@ -45,7 +48,22 @@ def main():
             plt.grid(axis='x', linestyle='--')
 
             plt.tight_layout()
+
+            chart_path = "current_chart.png"
+            plt.savefig(chart_path)
+
             plt.show()
+
+            total_cars = grouped_df[targeted_col].sum()
+            best_city = grouped_df.iloc[0][region_col]
+            best_count = grouped_df.iloc[0][targeted_col]
+
+            generate_dynamic_report(
+                total_vehicles=total_cars,
+                top_city=best_city,
+                top_city_count=best_count,
+                chart_image_path=chart_path,
+            )
 
     except Exception as e:
         print(f"There was an error in the program: {e}")
